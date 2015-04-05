@@ -5,6 +5,7 @@ open FsUnit
 open SonarRestService
 open Foq
 open System.IO
+open System.Linq
 
 open VSSonarPlugins.Types
 
@@ -76,7 +77,7 @@ type QualityTests() =
         profile.Language <- "cs"
         (service :> ISonarRestService).GetRulesForProfile(conf, profile)
         profile.Rules.Count |> should equal 199
-        profile.Rules.[1].Params.Count |> should equal 1
+        profile.Rules.First().Value.Params.Count |> should equal 1
 
     [<Test>]
     member test.``Should Search Rule in Profile`` () =

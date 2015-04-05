@@ -7,6 +7,8 @@
     xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
 	xmlns:analysis="clr-namespace:VSSonarExtensionUi.ViewModel.Analysis"
 	xmlns:analysisView="clr-namespace:VSSonarExtensionUi.View.Analysis"
+	xmlns:tb="http://www.hardcodet.net/taskbar"
+	xmlns:view="clr-namespace:VSSonarExtensionUi.View"
 	mc:Ignorable="d"
 	x:Class="VSSonarExtensionUi.View.SonarQubeUserControlVs"
 	x:Name="UserControl"
@@ -46,7 +48,14 @@
                     <TextBlock Text="{Binding Name}"></TextBlock>
                 </StackPanel>
         	</DataTemplate>
-            
+
+            <ContextMenu x:Shared="false" x:Key="SysTrayMenu">
+                <MenuItem Header="Show Window" Command="{Binding ShowWindowCommand}" />
+                <MenuItem Header="Hide Window" Command="{Binding HideWindowCommand}" />
+                <Separator />
+                <MenuItem Header="Exit" Command="{Binding ExitApplicationCommand}" />
+            </ContextMenu>
+
         </ResourceDictionary>
     </UserControl.Resources>
             
@@ -105,7 +114,7 @@
 				</StatusBarItem>            
 			<StatusBarItem HorizontalAlignment="Right">
 				<StackPanel Orientation="Horizontal">
-                    
+
                     <StatusBarItem>                                              
                         <ToggleButton Width="30"
                                       Height="30"

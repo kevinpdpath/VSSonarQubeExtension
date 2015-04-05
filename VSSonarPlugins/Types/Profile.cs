@@ -29,7 +29,7 @@ namespace VSSonarPlugins.Types
     {
         public Profile()
         {
-            this.Rules = new List<Rule>();
+            this.Rules = new Dictionary<string, Rule>();
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace VSSonarPlugins.Types
         /// <summary>
         /// Gets or sets the rules.
         /// </summary>
-        public List<Rule> Rules { get; set; }
+        public Dictionary<string, Rule> Rules { get; set; }
 
         /// <summary>
         /// Gets or sets the projects.
@@ -76,14 +76,21 @@ namespace VSSonarPlugins.Types
         /// <returns>
         /// The <see cref="Rule"/>.
         /// </returns>
-        public static Rule IsRuleEnabled(Profile profile, string idWithRepository)
+        public static Rule IsRuleEnabled(Profile profile, string internalKey)
         {
             if (profile == null)
             {
                 return null;
             }
 
-            return profile.Rules.FirstOrDefault(rule => (rule.Repo + ":" + rule.Key).Equals(idWithRepository));
+            try
+            {
+                return profile.Rules[internalKey];
+            }
+            catch (KeyNotFoundException)
+            {
+                return null;
+            }
         }
 
         /// <summary>
@@ -97,41 +104,22 @@ namespace VSSonarPlugins.Types
         /// </returns>
         public bool IsRulePresent(string key)
         {
-            return this.Rules.Any(rule => rule.Key.Equals(key));
+            return this.Rules.ContainsKey(key);
         }
 
-        /// <summary>
-        /// The get rule.
-        /// </summary>
-        /// <param name="key">
-        /// The key.
-        /// </param>
-        /// <returns>
-        /// The <see cref="Rule"/>.
-        /// </returns>
-        public Rule GetRule(string key)
+        /// <summary>The get rule.</summary>
+        /// <param name="internalKey">The internal Key.</param>
+        /// <returns>The <see cref="Rule"/>.</returns>
+        public Rule GetRule(string internalKey)
         {
-            int i = 0;
-            foreach (var rule in this.Rules)
+            try
             {
-                if (rule.Key.Equals(key) || rule.Key.EndsWith(":" + key))
-                {
-                    return rule;
-                }
-
-                if (string.IsNullOrEmpty(rule.InternalKey))
-                {
-                    continue;
-                }
-
-                i++;
-                if (rule.InternalKey.Equals(key) || rule.InternalKey.EndsWith(":" + key))
-                {
-                    return rule;
-                }
+                return this.Rules[internalKey];
             }
-
-            return null;
+            catch (KeyNotFoundException)
+            {
+                return null;
+            }
         }
 
         /// <summary>
@@ -144,7 +132,7 @@ namespace VSSonarPlugins.Types
         {
             if (!this.IsRulePresent(rule.Key))
             {
-                this.Rules.Add(rule);
+                this.Rules.Add(rule.InternalKey, rule);
             }
         }
     }
